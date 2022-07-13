@@ -1,5 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { AiOutlineInfoCircle } from "react-icons/ai";
 
 import EthIcon from "../img/eth.svg";
 
@@ -22,7 +24,9 @@ const Home = () => {
         <div className="bg-gradient-to-r from-[#eb3b5a] via-[#fa8231] to-pink-500 rounded shadow-md p-3 my-4">
           <div className="flex justify-between mb-8">
             <img src={EthIcon} className="w-[50px]" alt="Eth Icon" />
-            <div></div>
+            <div>
+              <AiOutlineInfoCircle className="text-white text-xl cursor-pointer" />
+            </div>
           </div>
           <p className="text-white text-sm">AFDRV....HJDG5DG</p>
           <div className="flex justify-between text-2xl font-bold text-white">
@@ -63,9 +67,14 @@ const Home = () => {
               className="p-3 rounded outline-none w-full mb-3"
             />
           </label>
-          <button className="py-3 bg-[#192a56] text-white rounded-md w-full text-center font-semibold hover:bg-[#273c75]">
+          <button className="py-3 mb-3 bg-[#192a56] text-white rounded-md w-full text-center font-semibold hover:bg-[#273c75]">
             Send
           </button>
+          <Link to="/transactions">
+            <button className="py-3 border transition ease-in-out delay-150 duration-300 border-[#192a56] text-[#192a56] rounded-md w-full text-center font-semibold  hover:scale-95">
+              See Transactions
+            </button>
+          </Link>
         </form>
       </div>
     </div>
