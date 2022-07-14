@@ -5,6 +5,8 @@ import { BiRightArrowAlt } from "react-icons/bi";
 
 import { TransactionContext } from "../context/TransactionContext";
 import EthIcon from "../img/eth.svg";
+import { shortenAddress } from "../utils/shortenAddress";
+import { roundBalance } from "../utils/roundBalance";
 
 const Home = () => {
   const {
@@ -30,19 +32,11 @@ const Home = () => {
     });
   };
 
-  const formatter = new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
-  });
-
   useEffect(() => {
     if (!connectedAccount) {
       navigate("/login");
     }
-    if (connectedAccountBalance.length > 0) {
-      setEthBalance(formatter.format(connectedAccountBalance));
-    }
-  }, [connectedAccount, connectedAccountBalance]);
+  }, [connectedAccount]);
 
   const sendTransactions = (e) => {
     e.preventDefault();
@@ -81,10 +75,17 @@ const Home = () => {
               </div>
             </Link>
           </div>
-          <p className="text-white text-sm">{connectedAccount}</p>
+          <p className="text-white text-sm">
+            {shortenAddress(connectedAccount)}
+          </p>
           <div className="flex justify-between text-2xl font-bold text-white">
             <h3>Ethereum</h3>
-            <h3>{ethBalance ? ethBalance : "0.00"} (Eth)</h3>
+            <h3>
+              {connectedAccountBalance
+                ? roundBalance(connectedAccountBalance)
+                : "0.00"}{" "}
+              (Eth)
+            </h3>
           </div>
         </div>
         <form action="#" className="my-4">
