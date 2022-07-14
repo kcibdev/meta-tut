@@ -7,7 +7,14 @@ import { TransactionContext } from "../context/TransactionContext";
 import EthIcon from "../img/eth.svg";
 
 const Home = () => {
-  const { connectWallet, connectedAccount } = useContext(TransactionContext);
+  const {
+    connectWallet,
+    connectedAccount,
+    connectedAccountBalance,
+    sendTransaction,
+    isLoading,
+  } = useContext(TransactionContext);
+  const [ethBalance, setEthBalance] = useState(0);
   const [transactionData, setTransactionData] = useState({
     address: "",
     amount: "",
@@ -17,28 +24,44 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setTransactionData((prevState) => ({
-      ...prevState,
+    setTransactionData({
+      ...transactionData,
       [e.target.name]: e.target.value,
-    }));
+    });
   };
+
+  const formatter = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 4,
+    maximumFractionDigits: 4,
+  });
 
   useEffect(() => {
     if (!connectedAccount) {
       navigate("/login");
     }
-  }, [connectedAccount]);
+    if (connectedAccountBalance.length > 0) {
+      setEthBalance(formatter.format(connectedAccountBalance));
+    }
+  }, [connectedAccount, connectedAccountBalance]);
 
-  const sendTransaction = () => {
+  const sendTransactions = (e) => {
+    e.preventDefault();
     //validate all transactionData fields
     if (
-      transactionData.address.length === 0 ||
-      transactionData.amount.length === 0 ||
-      transactionData.message.length === 0
+      !transactionData.address ||
+      !transactionData.amount ||
+      !transactionData.message
     ) {
       alert("Please fill in all fields");
       return;
     }
+    //send transaction
+    sendTransaction(
+      transactionData.address,
+      transactionData.amount,
+      transactionData.message,
+      transactionData.keyword
+    );
   };
 
   return (
@@ -61,7 +84,7 @@ const Home = () => {
           <p className="text-white text-sm">{connectedAccount}</p>
           <div className="flex justify-between text-2xl font-bold text-white">
             <h3>Ethereum</h3>
-            <h3>5.045 (Eth)</h3>
+            <h3>{ethBalance ? ethBalance : "0.00"} (Eth)</h3>
           </div>
         </div>
         <form action="#" className="my-4">
@@ -70,6 +93,7 @@ const Home = () => {
               type="text"
               placeholder="Address to..."
               id="wallet-address"
+              name="address"
               className="p-3 rounded outline-none w-full mb-3"
               value={transactionData.address}
               onChange={handleChange}
@@ -80,6 +104,7 @@ const Home = () => {
               type="number"
               placeholder="Amount (ETH)"
               id="wallet-amount"
+              name="amount"
               className="p-3 rounded outline-none w-full mb-3"
               value={transactionData.amount}
               onChange={handleChange}
@@ -90,6 +115,7 @@ const Home = () => {
               type="text"
               placeholder="Keyword (GIF)"
               id="wallet-keyword"
+              name="keyword"
               className="p-3 rounded outline-none w-full mb-3"
               value={transactionData.keyword}
               onChange={handleChange}
@@ -100,12 +126,17 @@ const Home = () => {
               type="text"
               placeholder="Message..."
               id="wallet-message"
+              name="message"
               className="p-3 rounded outline-none w-full mb-3"
               value={transactionData.message}
               onChange={handleChange}
             />
           </label>
-          <button className="py-3 mb-3 bg-[#192a56] text-white rounded-md w-full text-center font-semibold hover:bg-[#273c75]">
+          <button
+            type="submit"
+            className="py-3 mb-3 bg-[#192a56] text-white rounded-md w-full text-center font-semibold hover:bg-[#273c75]"
+            onClick={sendTransactions}
+          >
             Send
           </button>
           {/* <Link to="/transactions">

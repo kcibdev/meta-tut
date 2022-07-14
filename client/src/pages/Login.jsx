@@ -5,7 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { TransactionContext } from "../context/TransactionContext";
 
 const Login = () => {
-  const { connectWallet, connectedAccount } = useContext(TransactionContext);
+  const { connectWallet, connectedAccount, connectedAccountBalance } =
+    useContext(TransactionContext);
 
   const navigate = useNavigate();
 
