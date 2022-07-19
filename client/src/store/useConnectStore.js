@@ -10,8 +10,8 @@ const { ethereum } = window;
 const counts = localStorage.getItem("transactionCount");
 
 const connectStore = (set) => ({
-  connectedAccount: null,
-  connectedAccountBalance: null,
+  connectedAccount: "",
+  connectedAccountBalance: "",
   isLoading: false,
   transactionCounts: counts,
   transactions: [],
@@ -21,8 +21,8 @@ const connectStore = (set) => ({
       const transactionContract = getEthereumContract();
       const transactions = await transactionContract.getTransactions();
       const structuredTransactions = transactions.map((transaction) => ({
-        receiver: transaction.to,
-        sender: transaction.from,
+        receiver: transaction.to.toString(),
+        sender: transaction.from.toString(),
         amount: parseInt(transaction.amount._hex) / 10 ** 18,
         timestamp: new Date(
           transaction.timestamp.toNumber() * 1000

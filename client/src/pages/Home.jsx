@@ -49,7 +49,7 @@ const Home = () => {
     }
   }, [connectedAccount]);
 
-  const sendingTransactions = (e) => {
+  const sendingTransactions = async (e) => {
     e.preventDefault();
     //validate all transactionData fields
     if (
@@ -62,7 +62,7 @@ const Home = () => {
     }
 
     //send transaction
-    sendTransaction(
+    await sendTransaction(
       transactionData.address,
       transactionData.amount,
       transactionData.message,
@@ -71,6 +71,14 @@ const Home = () => {
       addTransaction,
       updateWalletBalance
     );
+
+    //clear transactionData
+    setTransactionData({
+      address: "",
+      amount: "",
+      message: "",
+      keyword: "",
+    });
   };
 
   return (

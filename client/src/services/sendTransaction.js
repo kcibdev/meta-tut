@@ -39,11 +39,11 @@ export const sendTransaction = async (
       keyword
     );
     addTransaction(true);
-    toast.success(`Transaction Sending...`);
+    toast.success(`Sending Transaction...`);
     await transactionHash.wait();
 
     const transactionCount = await transactionContract.getTransactionCount();
-    toast.success(`Transaction Sent - ${transactionHash}`);
+    toast.success(`Transaction Sent`);
 
     addTransaction(false, transactionCount.toNumber());
 
