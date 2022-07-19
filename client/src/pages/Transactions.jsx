@@ -5,7 +5,15 @@ import { TransactionContext } from "../context/TransactionContext";
 import TransactionCard from "../components/TransactionCard";
 
 const Transactions = () => {
-  const { connectWallet, connectedAccount } = useContext(TransactionContext);
+  const { connectWallet, connectedAccount, transactions } =
+    useContext(TransactionContext);
+  //   const {
+  //   connectWallet,
+  //   connectedAccount,
+  //   connectedAccountBalance,
+  //   sendTransaction,
+  //   isLoading,
+  // } = useConnectStore((state) => state);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,8 +27,12 @@ const Transactions = () => {
       <div className="shadow-md rounded-sm max-w-[450px] w-full">
         <h1 className="text-2xl font-bold py-3 text-center">Transactions</h1>
         <div className="flex-flex-col">
-          <TransactionCard />
-          <TransactionCard />
+          {transactions.map((transaction) => (
+            <TransactionCard
+              key={transaction.timestamp}
+              transaction={transaction}
+            />
+          ))}
         </div>
       </div>
     </div>

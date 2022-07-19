@@ -2,20 +2,23 @@ import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { BiRightArrowAlt } from "react-icons/bi";
+import PulseLoader from "react-spinners/PulseLoader";
 
-import { TransactionContext } from "../context/TransactionContext";
+import { sendTransaction } from "../services/sendTransaction";
 import EthIcon from "../img/eth.svg";
 import { shortenAddress } from "../utils/shortenAddress";
 import { roundBalance } from "../utils/roundBalance";
+import useConnectStore from "../store/useConnectStore";
 
 const Home = () => {
   const {
     connectWallet,
     connectedAccount,
     connectedAccountBalance,
-    sendTransaction,
     isLoading,
-  } = useContext(TransactionContext);
+    addTransaction,
+    updateWalletBalance,
+  } = useConnectStore((state) => state);
   const [ethBalance, setEthBalance] = useState(0);
   const [transactionData, setTransactionData] = useState({
     address: "",
@@ -38,7 +41,7 @@ const Home = () => {
     }
   }, [connectedAccount]);
 
-  const sendTransactions = (e) => {
+  const sendingTransactions = (e) => {
     e.preventDefault();
     //validate all transactionData fields
     if (
@@ -49,12 +52,17 @@ const Home = () => {
       alert("Please fill in all fields");
       return;
     }
+
+    console.log("1");
     //send transaction
     sendTransaction(
       transactionData.address,
       transactionData.amount,
       transactionData.message,
-      transactionData.keyword
+      transactionData.keyword,
+      connectedAccount,
+      addTransaction,
+      updateWalletBalance
     );
   };
 
@@ -133,13 +141,21 @@ const Home = () => {
               onChange={handleChange}
             />
           </label>
-          <button
-            type="submit"
-            className="py-3 mb-3 bg-[#192a56] text-white rounded-md w-full text-center font-semibold hover:bg-[#273c75]"
-            onClick={sendTransactions}
-          >
-            Send
-          </button>
+          {!isLoading && (
+            <button
+              type="submit"
+              className="py-3 mb-3 bg-[#192a56] text-white rounded-md w-full text-center font-semibold hover:bg-[#273c75]"
+              onClick={sendingTransactions}
+            >
+              Send
+            </button>
+          )}
+          <PulseLoader
+            size={15}
+            className="ml-3"
+            color={"#192a56"}
+            loading={isLoading}
+          />
           {/* <Link to="/transactions">
             <button className="py-3 border transition ease-in-out delay-150 duration-300 border-[#192a56] text-[#192a56] rounded-md w-full text-center font-semibold  hover:scale-95">
               See Transactions

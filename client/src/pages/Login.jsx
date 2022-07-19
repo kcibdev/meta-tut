@@ -3,18 +3,19 @@ import MetaMask from "../img/metamask.svg";
 import { Link, useNavigate } from "react-router-dom";
 
 import { TransactionContext } from "../context/TransactionContext";
+import useConnectStore from "../store/useConnectStore";
 
 const Login = () => {
   const { connectWallet, connectedAccount, connectedAccountBalance } =
-    useContext(TransactionContext);
+    useConnectStore((state) => state);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (connectedAccount) {
+    if (connectedAccount || connectedAccountBalance) {
       navigate("/");
     }
-  }, [connectedAccount]);
+  }, [connectedAccount, connectedAccountBalance]);
 
   return (
     <div className="flex justify-center items-center h-[100vh]">

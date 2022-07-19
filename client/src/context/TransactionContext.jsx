@@ -23,9 +23,31 @@ export const TransactionProvider = ({ children }) => {
   const [connectedAccount, setConnectedAccount] = useState("");
   const [connectedAccountBalance, setConnectedAccountBalance] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [transactions, setTransactions] = useState([]);
   const [transactionCount, setTransactionCount] = useState(
     localStorage.getItem("transactionCount")
   );
+
+  const getAllTransactions = async () => {
+    try {
+      if (!ethereum) return alert("Please connect to metamask wallet");
+      const transactionContract = getEthereumContract();
+      const transactions = await transactionContract.getTransactions();
+      const structuredTransactions = transactions.map((transaction) => ({
+        receiver: transaction.to,
+        sender: transaction.from,
+        amount: parseInt(transaction.amount._hex) / 10 ** 18,
+        timestamp: new Date(
+          transaction.timestamp.toNumber() * 1000
+        ).toLocaleString(),
+        message: transaction.message,
+        keyword: transaction.keyword,
+      }));
+      setTransactions(structuredTransactions);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const checkIfWalletConnected = async () => {
     try {
@@ -39,6 +61,7 @@ export const TransactionProvider = ({ children }) => {
         const balance = await provider.getBalance(accounts[0]);
         const balanceInEth = ethers.utils.formatEther(balance);
         setConnectedAccountBalance(balanceInEth);
+        getAllTransactions();
       } else {
         console.log("No accounts found");
       }
@@ -106,8 +129,22 @@ export const TransactionProvider = ({ children }) => {
     }
   };
 
+  const checkIfTransactionExist = async () => {
+    try {
+      if (!ethereum) return alert("Please install metamask wallet extension");
+
+      const transactionContract = getEthereumContract();
+      const transactionCount = await transactionContract.getTransactionCount();
+      localStorage.setItem("transactionCount", transactionCount);
+    } catch (error) {
+      console.log(error);
+      throw new Error("No etherum wallet found");
+    }
+  };
+
   useEffect(() => {
-    checkIfWalletConnected();
+    // checkIfWalletConnected();
+    checkIfTransactionExist();
   }, []);
 
   return (
@@ -118,6 +155,7 @@ export const TransactionProvider = ({ children }) => {
         connectedAccountBalance,
         sendTransaction,
         isLoading,
+        transactions,
       }}
     >
       {children}
