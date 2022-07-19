@@ -13,7 +13,6 @@ export const sendTransaction = async (
   addTransaction,
   updateWalletBalance
 ) => {
-  console.log("2");
   try {
     if (!ethereum)
       return toast.error("Please install metamask wallet extension");
@@ -40,11 +39,11 @@ export const sendTransaction = async (
       keyword
     );
     addTransaction(true);
-    console.log("Loading transactionHash", transactionHash);
+    toast.success(`Transaction Sending...`);
     await transactionHash.wait();
 
     const transactionCount = await transactionContract.getTransactionCount();
-    console.log("Loading transactionHash - success", transactionHash);
+    toast.success(`Transaction Sent - ${transactionHash}`);
 
     addTransaction(false, transactionCount.toNumber());
 

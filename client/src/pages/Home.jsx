@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { BiRightArrowAlt } from "react-icons/bi";
 import PulseLoader from "react-spinners/PulseLoader";
+import { toast } from "react-toastify";
 
 import { sendTransaction } from "../services/sendTransaction";
 import EthIcon from "../img/eth.svg";
@@ -18,6 +19,7 @@ const Home = () => {
     isLoading,
     addTransaction,
     updateWalletBalance,
+    logoutFromStore,
   } = useConnectStore((state) => state);
   const [ethBalance, setEthBalance] = useState(0);
   const [transactionData, setTransactionData] = useState({
@@ -35,6 +37,12 @@ const Home = () => {
     });
   };
 
+  window.ethereum.on("accountsChanged", async (accounts) => {
+    if (accounts.length) {
+      connectWallet();
+    }
+  });
+
   useEffect(() => {
     if (!connectedAccount) {
       navigate("/login");
@@ -49,11 +57,10 @@ const Home = () => {
       !transactionData.amount ||
       !transactionData.message
     ) {
-      alert("Please fill in all fields");
+      toast.error("Please fill in all fields");
       return;
     }
 
-    console.log("1");
     //send transaction
     sendTransaction(
       transactionData.address,
@@ -144,7 +151,7 @@ const Home = () => {
           {!isLoading && (
             <button
               type="submit"
-              className="py-3 mb-3 bg-[#192a56] text-white rounded-md w-full text-center font-semibold hover:bg-[#273c75]"
+              className="py-3 mb-3 bg-[#192a56] text-white rounded-md w-full text-center font-semibold hover:scale-95 transition ease-in-out delay-150 duration-300"
               onClick={sendingTransactions}
             >
               Send
@@ -156,11 +163,13 @@ const Home = () => {
             color={"#192a56"}
             loading={isLoading}
           />
-          {/* <Link to="/transactions">
-            <button className="py-3 border transition ease-in-out delay-150 duration-300 border-[#192a56] text-[#192a56] rounded-md w-full text-center font-semibold  hover:scale-95">
-              See Transactions
-            </button>
-          </Link> */}
+
+          <button
+            className="py-3 border transition ease-in-out delay-150 duration-300 border-[#192a56] text-[#192a56] rounded-md w-full text-center font-semibold hover:scale-95"
+            onClick={logoutFromStore}
+          >
+            Logout
+          </button>
         </form>
       </div>
     </div>

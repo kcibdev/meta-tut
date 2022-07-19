@@ -14,13 +14,29 @@ const connectStore = (set) => ({
   connectedAccountBalance: null,
   isLoading: false,
   transactionCounts: counts,
-  // checkIfWalletConnected: async () => {
-  //   // check if connectStore is in localstorage
-  //   const connectedAccount = localStorage.getItem("connectStore");
-  //   if (connectedAccount) {
-
-  //   }
-  // },
+  transactions: [],
+  getAllTransactions: async () => {
+    try {
+      if (!ethereum) return toast.error("Please connect to metamask wallet");
+      const transactionContract = getEthereumContract();
+      const transactions = await transactionContract.getTransactions();
+      const structuredTransactions = transactions.map((transaction) => ({
+        receiver: transaction.to,
+        sender: transaction.from,
+        amount: parseInt(transaction.amount._hex) / 10 ** 18,
+        timestamp: new Date(
+          transaction.timestamp.toNumber() * 1000
+        ).toLocaleString(),
+        message: transaction.message,
+        keyword: transaction.keyword,
+      }));
+      set((state) => ({
+        transactions: structuredTransactions,
+      }));
+    } catch (error) {
+      throw new Error("No etherum wallet found");
+    }
+  },
   updateWalletBalance: async () => {
     try {
       const provider = new ethers.providers.Web3Provider(ethereum);
@@ -61,6 +77,16 @@ const connectStore = (set) => ({
     set((state) => ({
       isLoading: isLoading,
       transactionCounts: transactionCounts,
+    }));
+  },
+  logoutFromStore: () => {
+    localStorage.removeItem("connectStore");
+    localStorage.removeItem("transactionCount");
+    set((state) => ({
+      connectedAccount: "",
+      connectedAccountBalance: "",
+      isLoading: false,
+      transactionCounts: null,
     }));
   },
 });
